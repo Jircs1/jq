@@ -2,14 +2,14 @@
 <html lang="en">
   <head>
     <script>
-      if ((window.location.host == "stedolan.github.io") && (window.location.protocol != "https:"))
+      if ((window.location.host == "jqlang.github.io") && (window.location.protocol != "https:"))
         window.location.protocol = "https";
     </script>
     <meta charset="utf-8">
     <title>jq 1.5 Manual</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link rel="canonical" href="https://stedolan.github.io/jq/manual/v1.5/" />
+    <link rel="canonical" href="https://jqlang.github.io/jq/manual/v1.5/" />
     <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.5/spacelab/bootstrap.min.css" rel="stylesheet" integrity="sha256-j7Dtnd7ZjexEiPNbscbopFn9+Cs0b3TLipKsWAPHZIM= sha512-RFhfi6P8zWMAJrEGU+CPjuxPh3r/UUBGqQ+/o6WKPIVZmQqeOipGotH2ihRULuQ8wsMBoK15TSZqc/7VYWyuIw==" crossorigin="anonymous">
     <link rel="stylesheet" href="/jq/css/base.css" type="text/css">
     <!--[if lt IE 9]>
@@ -46,10 +46,10 @@
                 <a href="/jq/manual/">Manual</a>
               </li>
             
-            <li><a href="https://github.com/stedolan/jq/issues">Issues</a></li>
-            <li><a href="https://github.com/stedolan/jq">Source</a></li>
+            <li><a href="https://github.com/jqlang/jq/issues">Issues</a></li>
+            <li><a href="https://github.com/jqlang/jq">Source</a></li>
             <li><a href="https://jqplay.org">Try online!</a></li>
-            <li><a href="https://raw.githubusercontent.com/stedolan/jq/master/NEWS">News</a></li>
+            <li><a href="https://raw.githubusercontent.com/jqlang/jq/master/NEWS">News</a></li>
           </ul>
         </div>
       </div>
@@ -82,7 +82,7 @@
               </li>
             
               <li>
-                <a href="#RegularexpressionsPCRE">Regular expressions (PCRE)</a>
+                <a href="#Regularexpressions">Regular expressions</a>
               </li>
             
               <li>
@@ -439,8 +439,8 @@ you need to surround it with double quotes like this: <code>."foo$"</code>.</p>
                     <code>.foo?</code>
                     
                   </h3>
-                  <p>Just like <code>.foo</code>, but does not output even an error when <code>.</code>
-is not an array or an object.</p>
+                  <p>Just like <code>.foo</code>, but does not output an error when <code>.</code> is not an
+object.</p>
 
                   
                     <div>
@@ -4436,8 +4436,8 @@ some systems.</p>
                   <p>The expression 'a == b' will produce 'true' if the result of a and b
 are equal (that is, if they represent equivalent JSON documents) and
 'false' otherwise. In particular, strings are never considered equal
-to numbers. If you're coming from Javascript, jq's == is like
-Javascript's === - considering values equal only when they have the
+to numbers. If you're coming from JavaScript, jq's == is like
+JavaScript's === - considering values equal only when they have the
 same type as well as the same value.</p>
 <p>!= is "not equal", and 'a != b' returns the opposite value of 'a == b'</p>
 
@@ -4499,7 +4499,7 @@ same type as well as the same value.</p>
 produces a value other than false or null, but act the same
 as <code>C</code> otherwise.</p>
 <p>Checking for false or null is a simpler notion of
-"truthiness" than is found in Javascript or Python, but it
+"truthiness" than is found in JavaScript or Python, but it
 means that you'll sometimes have to be more explicit about
 the condition you want: you can't test whether, e.g. a
 string is empty using <code>if .name then A else B end</code>, you'll
@@ -4837,7 +4837,7 @@ structures like <code>reduce</code>, <code>foreach</code>, <code>while</code>, a
 <pre><code># Repeat an expression until it raises "break" as an
 # error, then stop repeating without re-raising the error.
 # But if the error caught is not "break" then re-raise it.
-try repeat(exp) catch .=="break" then empty else error;
+try repeat(exp) catch if .=="break" then empty else error
 </code></pre>
 <p>jq has a syntax for named lexical labels to "break" or "go (back) to":</p>
 <pre><code>label $out | ... break $out ...
@@ -4895,42 +4895,42 @@ is lexical: the label has to be "visible" from the break.</p>
               
             </section>
           
-            <section id="RegularexpressionsPCRE">
-              <h2>Regular expressions (PCRE)</h2>
-              <p>jq uses the Oniguruma regular expression library, as do php,
-ruby, TextMate, Sublime Text, etc, so the description here
+            <section id="Regularexpressions">
+              <h2>Regular expressions</h2>
+              <p>jq uses the Oniguruma regular expression library, as do PHP,
+Ruby, TextMate, Sublime Text, etc, so the description here
 will focus on jq specifics.</p>
 <p>The jq regex filters are defined so that they can be used using
 one of these patterns:</p>
-<pre><code>STRING | FILTER( REGEX )
-STRING | FILTER( REGEX; FLAGS )
-STRING | FILTER( [REGEX] )
-STRING | FILTER( [REGEX, FLAGS] )
+<pre><code>STRING | FILTER(REGEX)
+STRING | FILTER(REGEX; FLAGS)
+STRING | FILTER([REGEX])
+STRING | FILTER([REGEX, FLAGS])
 </code></pre>
-<p>where:
-<em> STRING, REGEX and FLAGS are jq strings and subject to jq string interpolation;
-</em> REGEX, after string interpolation, should be a valid PCRE regex;
-* FILTER is one of <code>test</code>, <code>match</code>, or <code>capture</code>, as described below.</p>
+<p>where:</p>
+<ul>
+<li>STRING, REGEX, and FLAGS are jq strings and subject to jq string interpolation;</li>
+<li>REGEX, after string interpolation, should be a valid regular expression;</li>
+<li>FILTER is one of <code>test</code>, <code>match</code>, or <code>capture</code>, as described below.</li>
+</ul>
 <p>FLAGS is a string consisting of one of more of the supported flags:</p>
 <ul>
 <li><code>g</code> - Global search (find all matches, not just the first)</li>
 <li><code>i</code> - Case insensitive search</li>
-<li><code>m</code> - Multi line mode ('.' will match newlines)</li>
+<li><code>m</code> - Multi line mode (<code>.</code> will match newlines)</li>
 <li><code>n</code> - Ignore empty matches</li>
 <li><code>p</code> - Both s and m modes are enabled</li>
-<li><code>s</code> - Single line mode ('^' -&gt; '\A', '$' -&gt; '\Z')</li>
+<li><code>s</code> - Single line mode (<code>^</code> -&gt; <code>\A</code>, <code>$</code> -&gt; <code>\Z</code>)</li>
 <li><code>l</code> - Find longest possible matches</li>
 <li><code>x</code> - Extended regex format (ignore whitespace and comments)</li>
 </ul>
-<p>To match whitespace in an x pattern use an escape such as \s, e.g.</p>
-<ul>
-<li>test( "a\sb", "x" ).</li>
-</ul>
+<p>To match a whitespace with the <code>x</code> flag, use <code>\s</code>, e.g.</p>
+<pre><code>jq -n '"a b" | test("a\\sb"; "x")'
+</code></pre>
 <p>Note that certain flags may also be specified within REGEX, e.g.</p>
-<ul>
-<li>jq -n '("test", "TEst", "teST", "TEST") | test( "(?i)te(?-i)st" )'</li>
-</ul>
-<p>evaluates to: true, true, false, false.</p>
+<pre><code>jq -n '("test", "TEst", "teST", "TEST") | test("(?i)te(?-i)st")'
+</code></pre>
+<p>evaluates to: <code>true</code>, <code>true</code>, <code>false</code>, <code>false</code>.</p>
               
                 <section id="test(val),test(regex;flags)">
                   <h3>
@@ -5198,7 +5198,7 @@ input string with <code>tostring</code>, after interpolation.  <code>tostring</c
 be a jq string, and may contain references to named captures. The
 named captures are, in effect, presented as a JSON object (as
 constructed by <code>capture</code>) to <code>tostring</code>, so a reference to a captured
-variable named "x" would take the form: "(.x)".</p>
+variable named "x" would take the form: <code>"\(.x)"</code>.</p>
 
                   
                 </section>
@@ -5228,7 +5228,7 @@ variable (as a function parameter, object member, or whatever) in
 which to place the data.</p>
 <p>It is also possible to define functions in jq, although this is
 is a feature whose biggest use is defining jq's standard library
-(many jq functions such as <code>map</code> and <code>find</code> are in fact written
+(many jq functions such as <code>map</code> and <code>select</code> are in fact written
 in jq).</p>
 <p>jq has reduction operators, which are very powerful but a bit
 tricky.  Again, these are mostly used internally, to define some
@@ -6036,7 +6036,7 @@ same object" or "not the same object".</p>
 <p>If an object has two fields which are arrays, <code>.foo</code> and <code>.bar</code>,
 and you append something to <code>.foo</code>, then <code>.bar</code> will not get
 bigger. Even if you've just set <code>.bar = .foo</code>. If you're used to
-programming in languages like Python, Java, Ruby, Javascript,
+programming in languages like Python, Java, Ruby, JavaScript,
 etc. then you can think of it as though jq does a full deep copy
 of every object before it does the assignment (for performance,
 it doesn't actually do that, but that's the general idea).</p>
@@ -6054,7 +6054,7 @@ and produce as output an object with the "foo" field set to
 in jq - all jq values are immutable. For instance,</p>
 <p>.foo = .bar | .foo.baz = 1</p>
 <p>will not have the side-effect of setting .bar.baz to be set
-to 1, as the similar-looking program in Javascript, Python,
+to 1, as the similar-looking program in JavaScript, Python,
 Ruby or other languages would. Unlike these languages (but
 like Haskell and some other functional languages), there is
 no notion of two arrays or objects being "the same array" or
@@ -6547,7 +6547,7 @@ install missing dependencies.</p>
           
             "gsub(regex; string), gsub(regex; string; flags)" : "gsub(regex;string),gsub(regex;string;flags)",
           
-          "Regular expressions (PCRE)" : "RegularexpressionsPCRE"
+          "Regular expressions" : "Regularexpressions"
           ,
         
           
